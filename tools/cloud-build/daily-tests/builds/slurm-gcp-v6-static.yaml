@@ -50,6 +50,14 @@ steps:
     else
         make
     fi
+    # skip 'test_reservation_exists' validator as reservation being created dynamically
+    sed -i '/blueprint_name: hpc-slurm-static/a \
+    \
+    validators:\
+    - validator: test_reservation_exists\
+      inputs: {}\
+      skip: true' examples/hpc-slurm-static.yaml
+
     BUILD_ID_FULL=$BUILD_ID
     BUILD_ID_SHORT=$${BUILD_ID_FULL:0:6}
 
