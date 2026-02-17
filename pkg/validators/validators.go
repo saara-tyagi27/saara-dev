@@ -255,7 +255,7 @@ func defaults(bp config.Blueprint) []config.Validator {
 		})
 		for _, varName := range bp.Vars.Keys() {
 			// Do not run logic for future reservations
-			if resKeyRegex.MatchString(varName) && !strings.Contains(varName, "future") {
+			if resKeyRegex.MatchString(varName) {
 				resRef := config.GlobalRef(varName).AsValue()
 
 				// Automatically add a reservation check for every detected reservation variable
