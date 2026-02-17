@@ -300,10 +300,8 @@ func testMachineTypeInZoneAvailability(bp config.Blueprint, inputs config.Dict) 
 // in the project, checking both standard and future reservation pools.
 func findReservationInOtherZones(ctx context.Context, s *compute.Service, projectID string, name string) ([]string, error) {
 	foundInZones := []string{}
-	var lastErr error
 
 	// 1. Search Standard Zonal Reservations
-	// === HIGHLIGHT: Added .Context(ctx) ===
 	aggList, err := s.Reservations.AggregatedList(projectID).Context(ctx).Do()
 	if err == nil {
 		for _, scopedList := range aggList.Items {
@@ -314,8 +312,6 @@ func findReservationInOtherZones(ctx context.Context, s *compute.Service, projec
 				}
 			}
 		}
-	} else {
-		lastErr = err
 	}
 
 	// 2. Search Future Reservations (Common for A4/B200/GB200)
@@ -329,8 +325,6 @@ func findReservationInOtherZones(ctx context.Context, s *compute.Service, projec
 				}
 			}
 		}
-	} else {
-		lastErr = fErr
 	}
 
 	// If we found results in either pool, we return them and ignore errors from the other
@@ -341,7 +335,7 @@ func findReservationInOtherZones(ctx context.Context, s *compute.Service, projec
 
 	// If both failed and we found nothing, return the last encountered error.
 	if err != nil && fErr != nil {
-		return nil, lastErr
+		return nil, fmt.Errorf("failed to list standard reservations: %v; failed to list future reservations: %v", err, fErr)
 	}
 
 	return foundInZones, nil
@@ -372,7 +366,14 @@ func TestReservationExists(ctx context.Context, reservationProjectID string, zon
 
 	// 3. Access Check: If both failed, check for metadata blindness (403/400).
 	// We handle this because users might be allowed to CONSUME but not DESCRIBE a shared reservation.
+	// Case A: Standard API Access Check
 	if msg, isSoft := getSoftWarningMessage(err, "test_reservation_exists", reservationProjectID, "Compute Engine API", "compute.reservations.get"); isSoft {
+		fmt.Println(msg)
+		return nil
+	}
+
+	// Case B: Future API Access Check
+	if msg, isSoft := getSoftWarningMessage(fErr, "test_reservation_exists", reservationProjectID, "Compute Engine API", "compute.futureReservations.get"); isSoft {
 		fmt.Println(msg)
 		return nil
 	}
