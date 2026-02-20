@@ -39,11 +39,12 @@ custom_vars:
   test_persistenced: true
   partitions:
   - a3ultra
-  mounts:
+  mounts: 
   - /home
   - /gcs
   instance_labels:
     a3ultra_onspot: true
+    time-to-live: "{{ time_to_live }}" # Dynamically set label
   enable_spot: true
 cli_deployment_vars:
   region: "{{ region }}"
