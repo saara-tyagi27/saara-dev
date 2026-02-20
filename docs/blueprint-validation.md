@@ -149,7 +149,7 @@ ghpc:
 ```
 
 ### Allowed Enum Validator
-The `allowed_enum` validator ensures that user-provided settings conform to a predefined list of allowed values (enums). Supports optional case_sensitive and allow_null flags.
+The `allowed_enum` validator ensures that user-provided settings conform to a predefined list of allowed values (enums). Supports optional `case_sensitive` (defaults to true) and `allow_null` (defaults to false) flags.
 
 **Example definition in `metadata.yaml`:**
 
