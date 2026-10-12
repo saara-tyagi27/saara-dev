@@ -17,7 +17,7 @@
 blueprint_name: hpc-slurm
 
 vars:
-  project_id:  ## Set GCP Project ID Here ##
+  project_id: ns-playground-a
   deployment_name: hpc-slurm
   region: us-central1
   zone: us-central1-a
@@ -26,11 +26,11 @@ vars:
   # Maximum number of dynamically provisioned nodes in the debug partition.
   debug_node_count_max: 4
   # Maximum number of dynamically provisioned nodes in the compute partition.
-  compute_node_count_max: 20
+  compute_node_count_max: 4
   # Machine type for the compute partition.
   compute_machine_type: c2-standard-60
   # Use Spot VMs for the compute partition.
-  compute_enable_spot_vm: false
+  compute_enable_spot_vm: true
 
 # Documentation for each of the modules used below can be found at
 # https://github.com/GoogleCloudPlatform/hpc-toolkit/blob/main/modules/README.md

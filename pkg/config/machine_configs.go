@@ -32,6 +32,7 @@ import (
 var (
 	machineTypeCache sync.Map // map[string]*compute.MachineType
 	computeService   *compute.Service
+	computeInitErr   error
 	computeOnce      sync.Once
 	// getMachineType is overridden in tests.
 	getMachineType = GetMachineType
@@ -141,18 +142,17 @@ func GetMachineType(project, zone, machineType string) (*compute.MachineType, er
 		return cached.(*compute.MachineType), nil
 	}
 
-	var initErr error
 	computeOnce.Do(func() {
 		s, err := compute.NewService(context.Background())
 		if err != nil {
-			initErr = fmt.Errorf("failed to initialize compute service: %w", err)
+			computeInitErr = fmt.Errorf("failed to initialize compute service: %w", err)
 			return
 		}
 		computeService = s
 	})
 
-	if initErr != nil {
-		return nil, initErr
+	if computeInitErr != nil {
+		return nil, computeInitErr
 	}
 
 	res, err := computeService.MachineTypes.Get(project, zone, machineType).Do()
